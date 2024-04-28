@@ -8,6 +8,7 @@
     <!--
       https://doc.babylonjs.com/features/featuresDeepDive/mesh/gaussianSplatting
       https://www.docswell.com/s/Tks_Yoshinaga/ZYWEY9-babylonjs#p48
+      https://www.crossroad-tech.com/entry/babylonjs-boundingbox
 
     -->
 
@@ -97,6 +98,9 @@
               var gltfMesh = gs;
               var boundingBox = BABYLON.BoundingBoxGizmo.MakeNotPickableAndWrapInBoundingBox(gltfMesh); // 元のサイズ
               //boundingBox.scaling = new BABYLON.Vector3(2.0, 2.0, 2.0); // 拡大
+              console.log("boundingbox:", boundingBox);
+              console.log("mesh size:", getMeshSize(gltfMesh));
+              console.log("boundingbox size:", getMeshSize(boundingBox));
 
               // Create bounding box gizmo
               var utilLayer = new BABYLON.UtilityLayerRenderer(scene)
@@ -137,6 +141,16 @@
         window.addEventListener("resize", function () {
           engine.resize();
         });
+
+        const getMeshSize = mesh => {
+          const sizes = mesh.getHierarchyBoundingVectors()
+          const size = {
+            x: sizes.max.x - sizes.min.x,
+            y: sizes.max.y - sizes.min.y,
+            z: sizes.max.z - sizes.min.z
+          }
+          return size
+        }
     </script>
 
   </body>
