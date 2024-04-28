@@ -7,6 +7,8 @@
 
     <!--
       https://doc.babylonjs.com/features/featuresDeepDive/mesh/gaussianSplatting
+      https://www.docswell.com/s/Tks_Yoshinaga/ZYWEY9-babylonjs#p48
+
     -->
 
     <script src="https://cdn.babylonjs.com/babylon.js"></script>
@@ -88,7 +90,26 @@
             dataURL3
           ).then(()=>{
               gs.position.y = -0.5;
-              gs.scaling = new BABYLON.Vector3(4.0, 4.0, 4.0);
+              //gs.scaling = new BABYLON.Vector3(4.0, 4.0, 4.0);
+
+              // ----- gizmo --- resize --
+              // wrap in bounding box mesh to avoid picking perf hit
+              var gltfMesh = gs;
+              var boundingBox = BABYLON.BoundingBoxGizmo.MakeNotPickableAndWrapInBoundingBox(gltfMesh); // 元のサイズ
+              //boundingBox.scaling = new BABYLON.Vector3(2.0, 2.0, 2.0); // 拡大
+
+              // Create bounding box gizmo
+              var utilLayer = new BABYLON.UtilityLayerRenderer(scene)
+              utilLayer.utilityLayerScene.autoClearDepthAndStencil = false;
+              var gizmo = new BABYLON.BoundingBoxGizmo(BABYLON.Color3.FromHexString("#0984e3"), utilLayer);
+              gizmo.attachedMesh = boundingBox;;
+
+              // --- gizmo --- move ---
+              // Create behaviors to drag and scale with pointers in VR
+              var sixDofDragBehavior = new BABYLON.SixDofDragBehavior()
+              boundingBox.addBehavior(sixDofDragBehavior)
+              var multiPointerScaleBehavior = new BABYLON.MultiPointerScaleBehavior()
+              boundingBox.addBehavior(multiPointerScaleBehavior)
           });
 
           return scene;
