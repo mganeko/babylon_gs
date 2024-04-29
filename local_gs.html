@@ -103,6 +103,7 @@
           // Our built-in 'ground' shape.
           const ground = BABYLON.MeshBuilder.CreateGround("ground", {width: 6, height: 6}, scene);
 
+          /*---
           // Gaussian Splatting
           const gs = new BABYLON.GaussianSplattingMesh("Halo", null, scene);
           gs.loadFileAsync(
@@ -136,6 +137,7 @@
               const multiPointerScaleBehavior = new BABYLON.MultiPointerScaleBehavior()
               boundingBox.addBehavior(multiPointerScaleBehavior)
           });
+          ---*/
 
           return scene;
         };
@@ -185,8 +187,29 @@
           console.log("reader.result:", reader.result);
           const dataURL = reader.result;
           //initFunction().then(() => {sceneToRender = scene});
-          console.log(dataURL)
+          console.log(dataURL);
+
+          addGsMesh(dataURL);
+          //addGsMesh(dataURL3);
         }
+      }
+
+      function addGsMesh(url) {
+        // const mesh = new BABYLON.Mesh("mesh", scene);
+        // BABYLON.SceneLoader.ImportMesh("", url, "", scene, function (newMeshes) {
+        //   newMeshes.forEach(function (newMesh) {
+        //     newMesh.parent = mesh;
+        //   });
+        // });
+
+        // Gaussian Splatting
+        const gs = new BABYLON.GaussianSplattingMesh("localGS", null, scene);
+          gs.loadFileAsync(
+            url
+          ).then(()=>{
+            gs.position.y = -0.5;
+            gs.scaling = new BABYLON.Vector3(4.0, 4.0, 4.0);
+          });
       }
     </script>
 
