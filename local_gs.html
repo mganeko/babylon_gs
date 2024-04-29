@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>GS</title>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+    <!--
+      https://doc.babylonjs.com/features/featuresDeepDive/mesh/gaussianSplatting
+      https://www.docswell.com/s/Tks_Yoshinaga/ZYWEY9-babylonjs#p48
+      https://www.crossroad-tech.com/entry/babylonjs-boundingbox
+
+      // -- base64 model --
+      https://doc.babylonjs.com/features/featuresDeepDive/importers/loadingFileTypes
+      https://playground.babylonjs.com/#7F6S08#55
+
+
+      TODO:
+        - [x] load and show GaussianSplattingMesh
+        - [x] add gizmo to rotate
+        - [x] add gizmo to scale
+        - [x] add gizmo to move
+        - [x] get mesh size
+
+        - [ ] VR mode
+        - [ ] upload local mesh
+          - [ ] load file to base64 data
+
+    -->
+
+    <script src="https://cdn.babylonjs.com/babylon.js"></script>
+    <style>
+        html, body {
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        #renderCanvas {
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+        }
+        
+        #canvasZone {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+    
+  </head>
+  <body>
+    <div id="fileControl">
+      &nbsp;
+      <input id="file_input" name="file_input" type="file" />
+      <button id="file_load" onclick="loadLocalModel()">Load</button>
+    </div>
+    <div id="canvasZone"><canvas id="renderCanvas"></canvas></div>
+    <script>
+        const dataURL1 = "https://raw.githubusercontent.com/CedricGuillemet/dump/master/Halo_Believe.splat";
+        const dataURL2 = "data/nudle.ply";
+        const dataURL3 = "data/nudle_crop.ply";
+        const canvas = document.getElementById("renderCanvas");
+
+        const startRenderLoop = function (engine, canvas) {
+            engine.runRenderLoop(function () {
+                if (sceneToRender && sceneToRender.activeCamera) {
+                    sceneToRender.render();
+                }
+            });
+        }
+
+        //var engine = null;
+        //var scene = null;
+        let sceneToRender = null;
+        const createDefaultEngine = function() { return new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true,  disableWebGL2Support: false}); };
+        const createScene = function () {
+
+          // This creates a basic Babylon Scene object (non-mesh)
+          const scene = new BABYLON.Scene(engine);
+
+          // This creates and positions a free camera (non-mesh)
+          const camera = new BABYLON.ArcRotateCamera("camera1", -1,1,10,new BABYLON.Vector3(0, 0, 0), scene);
+
+          // This attaches the camera to the canvas
+          camera.attachControl(canvas, true);
+
+          // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
+          const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
+
+          // Default intensity is 1. Let's dim the light a small amount
+          light.intensity = 0.7;
+
+          // Our built-in 'sphere' shape.
+          const sphere = BABYLON.MeshBuilder.CreateSphere("sphere", {diameter: 1, segments: 32}, scene);
+
+          // Move the sphere upward 1/2 its height
+          sphere.position.y = 0.5;
+          sphere.position.z = -1;
+
+          // Our built-in 'ground' shape.
+          const ground = BABYLON.MeshBuilder.CreateGround("ground", {width: 6, height: 6}, scene);
+
+          // Gaussian Splatting
+          const gs = new BABYLON.GaussianSplattingMesh("Halo", null, scene);
+          gs.loadFileAsync(
+            //"https://raw.githubusercontent.com/CedricGuillemet/dump/master/Halo_Believe.splat"
+            //dataURL1
+            //dataURL2
+            dataURL3
+          ).then(()=>{
+              gs.position.y = -0.5;
+              //gs.scaling = new BABYLON.Vector3(4.0, 4.0, 4.0);
+
+              // ----- gizmo --- resize --
+              // wrap in bounding box mesh to avoid picking perf hit
+              const gltfMesh = gs;
+              const boundingBox = BABYLON.BoundingBoxGizmo.MakeNotPickableAndWrapInBoundingBox(gltfMesh); // 元のサイズ
+              //boundingBox.scaling = new BABYLON.Vector3(2.0, 2.0, 2.0); // 拡大
+              console.log("boundingbox:", boundingBox);
+              console.log("mesh size:", getMeshSize(gltfMesh));
+              console.log("boundingbox size:", getMeshSize(boundingBox));
+
+              // Create bounding box gizmo
+              const utilLayer = new BABYLON.UtilityLayerRenderer(scene)
+              utilLayer.utilityLayerScene.autoClearDepthAndStencil = false;
+              const gizmo = new BABYLON.BoundingBoxGizmo(BABYLON.Color3.FromHexString("#0984e3"), utilLayer);
+              gizmo.attachedMesh = boundingBox;;
+
+              // --- gizmo --- move ---
+              // Create behaviors to drag and scale with pointers in VR
+              const sixDofDragBehavior = new BABYLON.SixDofDragBehavior()
+              boundingBox.addBehavior(sixDofDragBehavior)
+              const multiPointerScaleBehavior = new BABYLON.MultiPointerScaleBehavior()
+              boundingBox.addBehavior(multiPointerScaleBehavior)
+          });
+
+          return scene;
+        };
+
+
+        window.initFunction = async function() {            
+          const asyncEngineCreation = async function() {
+            try {
+              return createDefaultEngine();
+            } catch(e) {
+              console.log("the available createEngine function failed. Creating the default engine instead");
+              return createDefaultEngine();
+            }
+          }
+
+          window.engine = await asyncEngineCreation();
+          if (!engine) throw 'engine should not be null.';
+          startRenderLoop(engine, canvas);
+          window.scene = createScene();
+        };
+        initFunction().then(() => {sceneToRender = scene});
+
+        // Resize
+        window.addEventListener("resize", function () {
+          engine.resize();
+        });
+
+        const getMeshSize = mesh => {
+          const sizes = mesh.getHierarchyBoundingVectors()
+          const size = {
+            x: sizes.max.x - sizes.min.x,
+            y: sizes.max.y - sizes.min.y,
+            z: sizes.max.z - sizes.min.z
+          }
+          return size
+        }
+
+      // ---- load local model ----
+      function loadLocalModel() {
+        const file_input = document.getElementById("file_input");
+        const file = file_input.files[0];
+        console.log("start loading file:", file);
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = function() {
+          console.log("file:", file);
+          console.log("reader.result:", reader.result);
+          const dataURL = reader.result;
+          //initFunction().then(() => {sceneToRender = scene});
+          console.log(dataURL)
+        }
+      }
+    </script>
+
+  </body>
+</html>
