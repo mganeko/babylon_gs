@@ -10,15 +10,15 @@
 
       const target = new BABYLON.Vector3(0, 0, 0);
 
-      const alpha =  3*Math.PI/2;
-      const beta = Math.PI/50;
-      const radius = 220*scale;
-      const camera = new BABYLON.ArcRotateCamera("Camera", alpha, beta, radius, target, scene);
+      //const alpha =  3*Math.PI/2;
+      //const beta = Math.PI/50;
+      //const radius = 220*scale;
+      //const camera = new BABYLON.ArcRotateCamera("Camera", alpha, beta, radius, target, scene);
  
-      // const alpha =  3*Math.PI/2;
-      // const beta = Math.PI/10;
-      // const radius = 100*scale; 
-      // const camera = new BABYLON.ArcRotateCamera("Camera", -1, 1, radius, target, scene);
+      const alpha =  3*Math.PI/2;
+      const beta = Math.PI/10;
+      const radius = 150*scale; 
+      const camera = new BABYLON.ArcRotateCamera("Camera", -1, 0.8, radius, target, scene);
 
       camera.attachControl(canvas, true);
   
@@ -82,7 +82,7 @@
     var gs = new BABYLON.GaussianSplattingMesh("Halo", null, scene);
     await gs.loadFileAsync(dataURL);
     
-    //gs.position.y = 0; -0.5;
+    gs.position.y = 0.5; -0.5;
     //gs.scaling = new BABYLON.Vector3(4.0, 4.0, 4.0);
 
     return gs;
