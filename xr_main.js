@@ -45,21 +45,47 @@
           featuresManager.enableFeature(BABYLON.WebXRFeatureName.TELEPORTATION, "stable", {
               xrInput: xrHelper.input,
               floorMeshes: [ground],
-              snapPositions: [new BABYLON.Vector3(2.4*3.5*scale, 0, -10*scale)],
+              //snapPositions: [new BABYLON.Vector3(2.4*3.5*scale, 0, -10*scale)],
+              snapPositions: [new BABYLON.Vector3(2*scale, 0, -2*scale)],
           });
   
-          featuresManager.enableFeature(BABYLON.WebXRFeatureName.HAND_TRACKING, "latest", {
-              xrInput: xrHelper.input,
-              jointMeshes: {
-                  disableDefaultHandMesh: true,
-                  enablePhysics: true
-              }
-          });
-  
+          // ---- hand tracking ---
+          // featuresManager.enableFeature(BABYLON.WebXRFeatureName.HAND_TRACKING, "latest", {
+          //     xrInput: xrHelper.input,
+          //     jointMeshes: {
+          //         disableDefaultHandMesh: true,
+          //         enablePhysics: true
+          //     }
+          // });
+
           // --- session manager and camera --
           const sessionManager = new WebXRSessionManager(scene);
           const xrCamera = new WebXRCamera("wrCam", scene, sessionManager);
           xrCamera.setTransformationFromNonVRCamera();
+
+          // -- coontroller ---
+          xrHelper.input.onControllerAddedObservable.add((inputSource) => {
+            inputSource.onMotionControllerInitObservable.add((motionController) => {
+                if(motionController.handness === "right"){
+                    // 右手にしかないボタン
+                    const aButtonComponent = motionController.getComponent("a-button");
+                    aButtonComponent.onButtonStateChangedObservable.add((component) => {
+                        if(component.value > 0.8 && component.pressed) {
+                            //header.text = "a button pressed";
+                            xrCamera.setTransformationFromNonVRCamera();
+                        }
+                    });
+                    const bButtonComponent = motionController.getComponent("b-button");
+                    bButtonComponent.onButtonStateChangedObservable.add((component) => {
+                        if(component.value > 0.8 && component.pressed) {
+                            header.text = "b button pressed";
+                        }
+                    });
+                };
+              });
+            });
+             
+                    
 
   
       } catch (e) {
