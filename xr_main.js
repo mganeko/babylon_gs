@@ -10,6 +10,10 @@
 
       const target = new BABYLON.Vector3(0, 0, 0);
 
+      const gsMesh = await loadGs(scene);
+      //prepareGizmo(gsMesh, scene);
+
+
       //const alpha =  3*Math.PI/2;
       //const beta = Math.PI/50;
       //const radius = 220*scale;
@@ -17,16 +21,14 @@
  
       const alpha =  3*Math.PI/2;
       const beta = Math.PI/10;
-      const radius = 150*scale; 
-      const camera = new BABYLON.ArcRotateCamera("Camera", -1, 0.8, radius, target, scene);
+      const radius = 100*scale; 
+      const camera = new BABYLON.ArcRotateCamera("Camera", -1.7, 1.2, radius, gsMesh, scene);
 
       camera.attachControl(canvas, true);
   
       const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
       light.intensity = 0.6;
   
-      const gsMesh = await loadGs(scene);
-      //prepareGizmo(gsMesh, scene);
   
   
       try {
