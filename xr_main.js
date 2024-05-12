@@ -54,6 +54,11 @@
               }
           });
   
+          // --- session manager and camera --
+          const sessionManager = new WebXRSessionManager(scene);
+          const xrCamera = new WebXRCamera("wrCam", scene, sessionManager);
+          xrCamera.setTransformationFromNonVRCamera();
+
   
       } catch (e) {
           console.log(e);
