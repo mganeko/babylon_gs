@@ -60,7 +60,7 @@
 
           // --- session manager and camera --
           const sessionManager = new BABYLON.WebXRSessionManager(scene);
-          const xrCamera = new WebXRCamera("xrCam", scene, sessionManager);
+          const xrCamera = new BABYLON.WebXRCamera("xrCam", scene, sessionManager);
           xrCamera.setTransformationFromNonVRCamera();
 
           // -- coontroller ---
