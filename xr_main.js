@@ -59,8 +59,8 @@
           // });
 
           // --- session manager and camera --
-          const sessionManager = new WebXRSessionManager(scene);
-          const xrCamera = new WebXRCamera("wrCam", scene, sessionManager);
+          const sessionManager = new BABYLON.WebXRSessionManager(scene);
+          const xrCamera = new WebXRCamera("xrCam", scene, sessionManager);
           xrCamera.setTransformationFromNonVRCamera();
 
           // -- coontroller ---
@@ -71,6 +71,7 @@
                     const aButtonComponent = motionController.getComponent("a-button");
                     aButtonComponent.onButtonStateChangedObservable.add((component) => {
                         if(component.value > 0.8 && component.pressed) {
+                            console.log("A button pressed");
                             //header.text = "a button pressed";
                             xrCamera.setTransformationFromNonVRCamera();
                         }
