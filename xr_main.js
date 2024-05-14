@@ -43,12 +43,12 @@
           const ground = BABYLON.MeshBuilder.CreateGround("ground", {width: 400, height: 400});
   
           // --- teleportation ---
-          // featuresManager.enableFeature(BABYLON.WebXRFeatureName.TELEPORTATION, "stable", {
-          //     xrInput: xrHelper.input,
-          //     floorMeshes: [ground],
-          //     //snapPositions: [new BABYLON.Vector3(2.4*3.5*scale, 0, -10*scale)],
-          //     snapPositions: [new BABYLON.Vector3(2*scale, 0, -2*scale)],
-          // });
+          featuresManager.enableFeature(BABYLON.WebXRFeatureName.TELEPORTATION, "stable", {
+              xrInput: xrHelper.input,
+              floorMeshes: [ground],
+              //snapPositions: [new BABYLON.Vector3(2.4*3.5*scale, 0, -10*scale)],
+              snapPositions: [new BABYLON.Vector3(2*scale, 0, -2*scale)],
+          });
   
           // ---- hand tracking ---
           // featuresManager.enableFeature(BABYLON.WebXRFeatureName.HAND_TRACKING, "latest", {

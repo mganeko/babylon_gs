@@ -29,7 +29,7 @@
     -->
 
     <script src="https://cdn.babylonjs.com/babylon.js"></script>
-    <script src="https://cdn.babylonjs.com/gui/babylon.gui.js"></script> <-- GUI -->
+    <script src="https://cdn.babylonjs.com/gui/babylon.gui.js"></script> <!-- GUI -->
     <style>
         html, body {
             overflow: hidden;
@@ -55,7 +55,9 @@
   <body>
     <div id="fileControl">
       &nbsp;
-      <input id="file_input" name="file_input" type="file" />
+      <input id="file_input" name="file_input" type="file" onchange="handleFileSelected()" />
+      <button id="file_load" onclick="fireInputFile()">select</button>
+      &nbsp;
       <button id="file_load" onclick="loadSelectedFile()">Load</button>
     </div>
     <div id="canvasZone"><canvas id="renderCanvas"></canvas></div>
@@ -155,6 +157,8 @@
           rect2.top = "-40%"; //200 px
           rect2.left = "-40%"; //"10%";
           rect2.onPointerClickObservable.add(async () => {
+            /*--
+            // --- chrome only ---
             const fhList = await selectLocalFile();
             if (fhList && (fhList.length > 0)) {
               const fh = fhList[0];
@@ -165,7 +169,9 @@
             else {
               console.log("no file selected.");
             }
-            
+            --*/
+
+            fireInputFile();
           });
           advancedTexture.addControl(rect2);
 
@@ -217,6 +223,23 @@
         const file_input = document.getElementById("file_input");
         const file = file_input.files[0];
         loadLocalModel(file);
+      }
+
+      function fireInputFile() {
+        const file_input = document.getElementById("file_input");
+        file_input.click();
+      }
+
+      function handleFileSelected() {
+        const file_input = document.getElementById("file_input");
+        if (file_input.files.length > 0) {
+          console.log("file selected:", file_input.files[0]);
+          const file = file_input.files[0];
+          loadLocalModel(file);
+        }
+        else {
+          console.log("no file selected.");
+        }
       }
 
       function loadLocalModel(file) {
