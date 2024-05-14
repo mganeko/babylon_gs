@@ -86,6 +86,9 @@
 
           // This creates and positions a free camera (non-mesh)
           const camera = new BABYLON.ArcRotateCamera("camera1", -1,1,10,new BABYLON.Vector3(0, 0, 0), scene);
+          camera.lowerRadiusLimit = 2;
+          camera.upperRadiusLimit = 50;
+          camera.radius = 10;
 
           // This attaches the camera to the canvas
           camera.attachControl(canvas, true);
