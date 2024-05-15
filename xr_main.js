@@ -94,6 +94,24 @@
           console.log(e);
       }
   
+      // --- GUI ----
+      // GUI
+      const advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
+      const rect2 = BABYLON.GUI.Button.CreateSimpleButton("button2", "Load GS model");
+      rect2.width = 0.2; // 0.2 = 20%
+      rect2.height = "40px";
+      rect2.cornerRadius = 20;
+      rect2.color = "white";
+      rect2.thickness = 4;
+      rect2.background = "blue";
+
+      rect2.top = "-40%"; //200 px
+      rect2.left = "-40%"; //"10%";
+      rect2.onPointerClickObservable.add(async () => {
+        console.log("clicked");
+        fireInputFile();
+      });
+      advancedTexture.addControl(rect2);
   
       return scene;
   }
@@ -156,5 +174,58 @@
     return gizmo;
   }
   
+  // ---- load local model ----
+  // function loadSelectedFile() {
+  //   const file_input = document.getElementById("file_input");
+  //   const file = file_input.files[0];
+  //   loadLocalModel(file);
+  // }
+
+  function fireInputFile() {
+    const file_input = document.getElementById("file_input");
+    file_input.click();
+  }
+
+  function handleFileSelected() {
+    const file_input = document.getElementById("file_input");
+    if (file_input.files.length > 0) {
+      console.log("file selected:", file_input.files[0]);
+      const file = file_input.files[0];
+      loadLocalModel(file);
+    }
+    else {
+      console.log("no file selected.");
+    }
+  }
+  window.handleFileSelected = handleFileSelected;
+
+  function loadLocalModel(file) {
+    //const file_input = document.getElementById("file_input");
+    //const file = file_input.files[0];
+    console.log("start loading file:", file);
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = function() {
+      console.log("file:", file);
+      console.log("reader.result:", reader.result);
+      const dataURL = reader.result;
+      //initFunction().then(() => {sceneToRender = scene});
+      console.log(dataURL);
+
+      addGsMesh(dataURL);
+      //addGsMesh(dataURL3);
+    }
+  }
+
+  function addGsMesh(url) {
+    // Gaussian Splatting
+    const gs = new BABYLON.GaussianSplattingMesh("localGS", null, scene);
+    gs.loadFileAsync(
+      url
+    ).then(()=>{
+      gs.position.y = -0.5;
+      gs.scaling = new BABYLON.Vector3(4.0, 4.0, 4.0);
+    });
+  }
   
 })()
